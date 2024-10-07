@@ -3,9 +3,10 @@ import Link from "next/link";
 import TodoAddForm from "./TodoAddForm/TodoAddForm";
 
 // import { PrismaClient } from "@prisma/client";
-import prisma from "@/prisma/prismadb";
+// import prisma from "@/prisma/prismadb";
 import { TodoType } from "@/types/todo.type";
 import TodoList from "./TodoList/ToddoList";
+import { NEXT_PUBLIC_API_URL } from "@/libs/constants";
 
 // const prisma = new PrismaClient();
 
@@ -20,7 +21,7 @@ import TodoList from "./TodoList/ToddoList";
 
 const fetchTodos = async () => {
   try {
-    const res = await fetch("http://localhost:3000/api/todo", {
+    const res = await fetch(`${NEXT_PUBLIC_API_URL}/api/todo`, {
       method: "GET",
       cache: "no-store",
     });
@@ -35,7 +36,7 @@ const fetchTodos = async () => {
 
 const TodoPage = async () => {
   const todos = await fetchTodos();
-  // console.log("todos", todos);
+  console.log("todos", NEXT_PUBLIC_API_URL);
 
   return (
     <Container p="md">

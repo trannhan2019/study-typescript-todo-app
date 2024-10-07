@@ -40,6 +40,7 @@ const TodoSearch = () => {
         rightSection={icon}
         value={value}
         onChange={onChange}
+        defaultValue={params?.search}
       />
     </>
   );

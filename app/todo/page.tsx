@@ -2,11 +2,12 @@ import { Anchor, Container, Group, Paper, Title } from "@mantine/core";
 import Link from "next/link";
 import TodoAddForm from "./TodoAddForm/TodoAddForm";
 
-import { PrismaClient } from "@prisma/client";
+// import { PrismaClient } from "@prisma/client";
+import prisma from "@/prisma/prismadb";
 import { TodoType } from "@/types/todo.type";
 import TodoList from "./TodoList/ToddoList";
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient();
 
 const fetchTodos = async () => {
   try {

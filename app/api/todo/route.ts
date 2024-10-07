@@ -33,3 +33,15 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+export async function GET() {
+  try {
+    const todos = await prisma.todo.findMany();
+    return NextResponse.json(todos, {
+      status: 200,
+    });
+  } catch (error) {
+    console.log("Error while get todos", error);
+    return NextResponse.json({ message: "Get todos errors" }, { status: 500 });
+  }
+}

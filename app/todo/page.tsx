@@ -9,18 +9,33 @@ import TodoList from "./TodoList/ToddoList";
 
 // const prisma = new PrismaClient();
 
+// const fetchTodos = async () => {
+//   try {
+//     const todos = await prisma.todo.findMany();
+//     return todos;
+//   } catch (error) {
+//     console.log("error todo", error);
+//   }
+// };
+
 const fetchTodos = async () => {
   try {
-    const todos = await prisma.todo.findMany();
-    return todos;
+    const res = await fetch("http://localhost:3000/api/todo", {
+      method: "GET",
+      cache: "no-store",
+    });
+    if (!res.ok) {
+      throw new Error("Failed to fetch todos");
+    }
+    return await res.json();
   } catch (error) {
-    console.log("error todo", error);
+    console.log("error", error);
   }
 };
 
 const TodoPage = async () => {
   const todos = await fetchTodos();
-  //   console.log("todos", todos);
+  // console.log("todos", todos);
 
   return (
     <Container p="md">

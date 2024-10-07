@@ -2,41 +2,41 @@ import { Anchor, Container, Group, Paper, Title } from "@mantine/core";
 import Link from "next/link";
 import TodoAddForm from "./TodoAddForm/TodoAddForm";
 
-// import { PrismaClient } from "@prisma/client";
-// import prisma from "@/prisma/prismadb";
-import { TodoType } from "@/types/todo.type";
+import { TodoResponse, TodoSearchParams, TodoType } from "@/types/todo.type";
 import TodoList from "./TodoList/ToddoList";
 import { NEXT_PUBLIC_API_URL } from "@/libs/constants";
+import TodoPagination from "./TodoPagination/TodoPagination";
+import TodoSearch from "./TodoSearch/TodoSearch";
 
-// const prisma = new PrismaClient();
+interface PageProps {
+  searchParams: TodoSearchParams;
+}
 
-// const fetchTodos = async () => {
-//   try {
-//     const todos = await prisma.todo.findMany();
-//     return todos;
-//   } catch (error) {
-//     console.log("error todo", error);
-//   }
-// };
-
-const fetchTodos = async () => {
+const fetchTodos = async (
+  searchParams: PageProps["searchParams"]
+): Promise<TodoResponse | undefined> => {
   try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/api/todo`, {
-      method: "GET",
-      cache: "no-store",
-    });
+    // let queryParams =
+    const res = await fetch(
+      `${NEXT_PUBLIC_API_URL}/api/todo?${new URLSearchParams(searchParams)}`,
+      {
+        method: "GET",
+        cache: "no-store",
+      }
+    );
     if (!res.ok) {
       throw new Error("Failed to fetch todos");
     }
+
     return await res.json();
   } catch (error) {
     console.log("error", error);
   }
 };
 
-const TodoPage = async () => {
-  const todos = await fetchTodos();
-  console.log("todos", NEXT_PUBLIC_API_URL);
+const TodoPage = async ({ searchParams }: PageProps) => {
+  const data = await fetchTodos(searchParams);
+  // console.log("todos", data?.page, data?.totalPages, data?.todos);
 
   return (
     <Container p="md">
@@ -49,8 +49,12 @@ const TodoPage = async () => {
             Go back Home
           </Anchor>
         </Group>
-        <TodoAddForm />
-        <TodoList todos={todos as TodoType[]} />
+        <Group justify="space-between" mb={"md"}>
+          <TodoAddForm />
+          <TodoSearch />
+        </Group>
+        <TodoList todos={data?.todos as TodoType[]} />
+        <TodoPagination total={data?.totalPages} />
       </Paper>
     </Container>
   );

@@ -5,3 +5,15 @@ export type TodoType = {
   createdAt: Date;
   updatedAt?: Date;
 };
+
+export type TodoResponse = {
+  todos: TodoType[] | undefined;
+  page: string | undefined;
+  totalPages: string | undefined;
+};
+
+export type TodoSearchParams = {
+  search?: string;
+  page?: string;
+  limit?: string;
+};

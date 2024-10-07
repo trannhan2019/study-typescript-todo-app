@@ -3,7 +3,7 @@
 import { useForm } from "@mantine/form";
 import { z } from "zod";
 import { zodResolver } from "mantine-form-zod-resolver";
-import { Button, FocusTrap, Group, TextInput } from "@mantine/core";
+import { Box, Button, FocusTrap, Group, TextInput } from "@mantine/core";
 import { useState } from "react";
 import { todoAddSchema } from "@/validation/todo";
 import { useRouter } from "next/navigation";
@@ -47,20 +47,22 @@ const TodoAddForm = () => {
   };
 
   return (
-    <form onSubmit={form.onSubmit(onSubmit)}>
-      <Group align="center">
-        <FocusTrap>
-          <TextInput
-            placeholder="Add Todo"
-            key={form.key("title")}
-            {...form.getInputProps("title")}
-          />
-        </FocusTrap>
-        <Button size="sm" loading={loading} type="submit">
-          Add Todo
-        </Button>
-      </Group>
-    </form>
+    <Box>
+      <form onSubmit={form.onSubmit(onSubmit)}>
+        <Group align="center">
+          <FocusTrap>
+            <TextInput
+              placeholder="Add Todo"
+              key={form.key("title")}
+              {...form.getInputProps("title")}
+            />
+          </FocusTrap>
+          <Button size="sm" loading={loading} type="submit">
+            Add Todo
+          </Button>
+        </Group>
+      </form>
+    </Box>
   );
 };
 

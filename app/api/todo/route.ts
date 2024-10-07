@@ -34,16 +34,43 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "5");
+    const search = searchParams.get("search") || "";
+    const skip = (page - 1) * limit;
+    const take = limit;
+
+    let where: any = {};
+    if (search) {
+      where = {
+        title: {
+          contains: search,
+          mode: "insensitive",
+        },
+      };
+    }
+
     const todos = await prisma.todo.findMany({
+      where,
+      skip,
+      take,
       orderBy: {
         createdAt: "desc",
       },
     });
-    return NextResponse.json(todos, {
-      status: 200,
-    });
+
+    const total = await prisma.todo.count({ where });
+    const totalPages = Math.ceil(total / limit);
+
+    return NextResponse.json(
+      { todos, page, totalPages },
+      {
+        status: 200,
+      }
+    );
   } catch (error) {
     console.log("Error while get todos", error);
     return NextResponse.json({ message: "Get todos errors" }, { status: 500 });

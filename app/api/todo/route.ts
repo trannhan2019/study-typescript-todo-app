@@ -1,8 +1,8 @@
 import { todoAddSchema } from "@/validation/todo";
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/prisma/prismadb";
 import { NextRequest, NextResponse } from "next/server";
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
   try {
@@ -36,7 +36,11 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   try {
-    const todos = await prisma.todo.findMany();
+    const todos = await prisma.todo.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
     return NextResponse.json(todos, {
       status: 200,
     });

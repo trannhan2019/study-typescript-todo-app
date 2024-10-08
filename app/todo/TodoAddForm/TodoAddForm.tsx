@@ -4,14 +4,16 @@ import { useForm } from "@mantine/form";
 import { z } from "zod";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { Box, Button, FocusTrap, Group, TextInput } from "@mantine/core";
-import { useState } from "react";
 import { todoAddSchema } from "@/validation/todo";
 import { useRouter } from "next/navigation";
 
 export type FormValues = z.infer<typeof todoAddSchema>;
+type Props = {
+  visible: boolean;
+  handleVisible: { open: () => void; close: () => void };
+};
 
-const TodoAddForm = () => {
-  const [loading, setLoading] = useState<boolean>(false);
+const TodoAddForm = ({ visible, handleVisible }: Props) => {
   const router = useRouter();
 
   const form = useForm<FormValues>({
@@ -23,7 +25,7 @@ const TodoAddForm = () => {
   });
 
   const onSubmit = async (values: FormValues): Promise<void> => {
-    setLoading(true);
+    handleVisible.open();
     try {
       const res = await fetch("/api/todo", {
         method: "POST",
@@ -38,11 +40,11 @@ const TodoAddForm = () => {
       }
 
       form.reset();
-      setLoading(false);
+      handleVisible.close();
       router.refresh();
     } catch (error) {
       console.log("Error while Registeing", error);
-      setLoading(false);
+      handleVisible.close();
     }
   };
 
@@ -57,7 +59,7 @@ const TodoAddForm = () => {
               {...form.getInputProps("title")}
             />
           </FocusTrap>
-          <Button size="sm" loading={loading} type="submit">
+          <Button size="sm" loading={visible} type="submit">
             Add Todo
           </Button>
         </Group>

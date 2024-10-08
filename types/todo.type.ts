@@ -6,11 +6,13 @@ export type TodoType = {
   updatedAt?: Date;
 };
 
-export type TodoResponse = {
-  todos: TodoType[] | undefined;
-  page: string | undefined;
-  totalPages: string | undefined;
-};
+export type TodoResponse =
+  | {
+      todos: TodoType[];
+      page: string;
+      totalPages: string;
+    }
+  | undefined;
 
 export type TodoSearchParams = {
   search?: string;

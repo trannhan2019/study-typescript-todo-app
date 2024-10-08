@@ -25,7 +25,7 @@ const TodoSearch = () => {
       search: value,
     });
     router.push(`${pathname}?${newParams.toString()}`);
-  }, 500);
+  }, 400);
 
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValue(event.currentTarget.value);

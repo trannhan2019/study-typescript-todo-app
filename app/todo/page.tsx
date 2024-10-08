@@ -1,16 +1,52 @@
 import { Anchor, Container, Group, Paper, Title } from "@mantine/core";
 import Link from "next/link";
-import TodoAddForm from "./TodoAddForm/TodoAddForm";
 
-import { TodoSearchParams } from "@/types/todo.type";
+import { TodoResponse, TodoSearchParams } from "@/types/todo.type";
 import TodoList from "./TodoList/ToddoList";
-import TodoSearch from "./TodoSearch/TodoSearch";
+import prisma from "@/prisma/prismadb";
 
 interface PageProps {
   searchParams: TodoSearchParams;
 }
 
+const fetchTodos = async (searchParams: TodoSearchParams) => {
+  try {
+    const page = parseInt(searchParams?.page || "1");
+    const limit = parseInt(searchParams?.limit || "5");
+    const skip = (page - 1) * limit;
+    const take = limit;
+    const search = searchParams?.search || "";
+
+    let where: any = {};
+    if (search) {
+      where = {
+        title: {
+          contains: search,
+          mode: "insensitive",
+        },
+      };
+    }
+    const todos = await prisma.todo.findMany({
+      where,
+      skip,
+      take,
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    const total = await prisma.todo.count({ where });
+    const totalPages = Math.ceil(total / limit);
+
+    return { todos, page, totalPages };
+  } catch (error) {
+    console.log("error todo", error);
+  }
+};
+
 const TodoPage = async ({ searchParams }: PageProps) => {
+  const data = await fetchTodos(searchParams);
+
   return (
     <Container p="md">
       <Paper withBorder shadow="md" p={"md"}>
@@ -22,11 +58,8 @@ const TodoPage = async ({ searchParams }: PageProps) => {
             Go back Home
           </Anchor>
         </Group>
-        <Group justify="space-between" mb={"md"}>
-          <TodoAddForm />
-          <TodoSearch />
-        </Group>
-        <TodoList searchParams={searchParams} />
+
+        <TodoList todoData={data as TodoResponse} />
       </Paper>
     </Container>
   );

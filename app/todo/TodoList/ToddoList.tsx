@@ -1,50 +1,56 @@
 "use client";
 
-import { TodoResponse, TodoSearchParams, TodoType } from "@/types/todo.type";
+import { TodoResponse, TodoType } from "@/types/todo.type";
 import Todo from "../Todo/Todo";
-import { Group, Paper, Stack } from "@mantine/core";
-import { NEXT_PUBLIC_API_URL } from "@/libs/constants";
+import {
+  Box,
+  Group,
+  Loader,
+  LoadingOverlay,
+  Paper,
+  Stack,
+} from "@mantine/core";
 import TodoPagination from "../TodoPagination/TodoPagination";
+import TodoAddForm from "../TodoAddForm/TodoAddForm";
+import TodoSearch from "../TodoSearch/TodoSearch";
+import { useDisclosure } from "@mantine/hooks";
+import { useEffect } from "react";
 
-interface TodoListProps {
-  searchParams: TodoSearchParams;
+interface Props {
+  todoData: TodoResponse;
 }
 
-const fetchTodos = async (
-  searchParams: TodoSearchParams
-): Promise<TodoResponse | undefined> => {
-  try {
-    // let queryParams =
-    const res = await fetch(
-      `${NEXT_PUBLIC_API_URL}/api/todo?${new URLSearchParams(searchParams)}`,
-      {
-        method: "GET",
-        cache: "no-store",
-      }
-    );
-    if (!res.ok) {
-      throw new Error("Failed to fetch todos");
+const TodoList = ({ todoData }: Props) => {
+  const [visible, handleVisible] = useDisclosure(false);
+  useEffect(() => {
+    if (todoData?.todos?.length === 0) {
+      handleVisible.open();
     }
-
-    return await res.json();
-  } catch (error) {
-    console.log("error", error);
-  }
-};
-
-const TodoList = async ({ searchParams }: TodoListProps) => {
-  const data = await fetchTodos(searchParams);
-  const todos = data?.todos;
+    handleVisible.close();
+  }, [todoData?.todos?.length]);
+  console.log(visible, "visible");
 
   return (
-    <Paper withBorder shadow="md" p={"md"}>
-      <Stack>
-        {todos?.map((todo: TodoType) => (
-          <Todo key={todo.id} todo={todo} />
-        ))}
-        <TodoPagination total={data?.totalPages} />
-      </Stack>
-    </Paper>
+    <>
+      <Group justify="space-between" mb={"md"}>
+        <TodoAddForm visible={visible} handleVisible={handleVisible} />
+        <TodoSearch />
+      </Group>
+
+      <Paper withBorder shadow="md" p={"md"}>
+        <Stack pos={"relative"}>
+          <LoadingOverlay
+            visible={visible}
+            loaderProps={{ children: <Loader type="bars" /> }}
+          />
+          {todoData?.todos?.map((todo: TodoType) => (
+            <Todo key={todo.id} todo={todo} />
+          ))}
+
+          <TodoPagination total={todoData?.totalPages} />
+        </Stack>
+      </Paper>
+    </>
   );
 };
 export default TodoList;

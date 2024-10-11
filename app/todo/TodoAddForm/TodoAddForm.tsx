@@ -5,16 +5,15 @@ import { z } from "zod";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { Box, Button, FocusTrap, Group, TextInput } from "@mantine/core";
 import { todoAddSchema } from "@/validation/todo";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next-nprogress-bar";
+import { useState } from "react";
+import { notifications } from "@mantine/notifications";
 
 export type FormValues = z.infer<typeof todoAddSchema>;
-type Props = {
-  visible: boolean;
-  handleVisible: { open: () => void; close: () => void };
-};
 
-const TodoAddForm = ({ visible, handleVisible }: Props) => {
+const TodoAddForm = () => {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
   const form = useForm<FormValues>({
     mode: "uncontrolled",
@@ -25,7 +24,7 @@ const TodoAddForm = ({ visible, handleVisible }: Props) => {
   });
 
   const onSubmit = async (values: FormValues): Promise<void> => {
-    handleVisible.open();
+    setLoading(true);
     try {
       const res = await fetch("/api/todo", {
         method: "POST",
@@ -40,11 +39,23 @@ const TodoAddForm = ({ visible, handleVisible }: Props) => {
       }
 
       form.reset();
-      handleVisible.close();
       router.refresh();
+      notifications.show({
+        title: "Success",
+        message: "Todo added successfully",
+        color: "green",
+      });
+
+      setLoading(false);
     } catch (error) {
       console.log("Error while Registeing", error);
-      handleVisible.close();
+      notifications.show({
+        title: "Error",
+        message: "Error while Registeing",
+        color: "red",
+      });
+
+      setLoading(false);
     }
   };
 
@@ -59,7 +70,7 @@ const TodoAddForm = ({ visible, handleVisible }: Props) => {
               {...form.getInputProps("title")}
             />
           </FocusTrap>
-          <Button size="sm" loading={visible} type="submit">
+          <Button size="sm" loading={loading} type="submit">
             Add Todo
           </Button>
         </Group>

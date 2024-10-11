@@ -2,7 +2,8 @@
 
 import useUrlParams from "@/hooks/useUrlParams";
 import { Group, NativeSelect, Pagination } from "@mantine/core";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
+import { useRouter } from "next-nprogress-bar";
 
 interface Props {
   total: string | undefined;

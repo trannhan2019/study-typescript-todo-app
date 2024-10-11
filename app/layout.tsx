@@ -3,7 +3,13 @@ import "@mantine/notifications/styles.css";
 
 import { theme } from "@/libs/theme";
 import { MantineProvider } from "@mantine/core";
+import { Notifications } from "@mantine/notifications";
+import { ModalsProvider } from "@mantine/modals";
 import type { Metadata } from "next";
+import MainLayout from "@/components/MainLayout/MainLayout";
+import { Suspense } from "react";
+import Loading from "./loading";
+import ProgressBarProvider from "@/components/ProgressBar/ProgressBarProvider";
 
 export const metadata: Metadata = {
   title: "Todo App",
@@ -18,7 +24,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <MantineProvider theme={theme}>{children}</MantineProvider>
+        <MantineProvider theme={theme}>
+          <Notifications position="top-right" />
+          <ModalsProvider />
+          <MainLayout>
+            <Suspense fallback={<Loading />}>
+              <ProgressBarProvider>{children}</ProgressBarProvider>
+            </Suspense>
+          </MainLayout>
+        </MantineProvider>
       </body>
     </html>
   );

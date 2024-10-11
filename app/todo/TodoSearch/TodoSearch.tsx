@@ -1,10 +1,11 @@
 "use client";
 
 import useUrlParams from "@/hooks/useUrlParams";
-import { rem, TextInput } from "@mantine/core";
+import { CloseButton, rem, TextInput } from "@mantine/core";
 import { useDebouncedCallback } from "@mantine/hooks";
 import { IconSearch } from "@tabler/icons-react";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next-nprogress-bar";
+import { usePathname } from "next/navigation";
 import React, { useState } from "react";
 
 const TodoSearch = () => {
@@ -16,7 +17,7 @@ const TodoSearch = () => {
 
   const [value, setValue] = useState("");
 
-  const icon = <IconSearch style={{ width: rem(16), height: rem(16) }} />;
+  const iconSearch = <IconSearch style={{ width: rem(16), height: rem(16) }} />;
 
   const handleSearch = useDebouncedCallback(() => {
     const newParams = new URLSearchParams({
@@ -37,7 +38,19 @@ const TodoSearch = () => {
       <TextInput
         placeholder="Search..."
         size="sm"
-        rightSection={icon}
+        leftSection={iconSearch}
+        rightSection={
+          <CloseButton
+            aria-label="Clear search"
+            onClick={() => {
+              setValue("");
+              handleSearch();
+            }}
+            variant="transparent"
+            size="sm"
+            style={{ display: value ? undefined : "none" }}
+          />
+        }
         value={value}
         onChange={onChange}
         defaultValue={params?.search}

@@ -10,18 +10,65 @@ import {
   Drawer,
   ScrollArea,
   rem,
+  Menu,
+  UnstyledButton,
+  Avatar,
+  Text,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import classes from "./header.module.css";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
+import { IconChevronDown, IconHeart, IconPower } from "@tabler/icons-react";
 
 const Header = () => {
   const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] =
     useDisclosure(false);
 
+  const { data: session } = useSession();
+  console.log(session);
+
+  const menuUser = () => {
+    return (
+      <Menu shadow="md" width={260}>
+        <Menu.Target>
+          <UnstyledButton>
+            <Group>
+              <Avatar
+                src={"https://github.com/creativetimofficial.png"}
+                size={20}
+              />
+              <Text>{session?.user.name}</Text>
+              <IconChevronDown
+                style={{ width: rem(12), height: rem(12) }}
+                stroke={1.5}
+              />
+            </Group>
+          </UnstyledButton>
+        </Menu.Target>
+        <Menu.Dropdown>
+          <Menu.Item leftSection={<IconPower style={{ width: rem(16) }} />}>
+            Log out
+          </Menu.Item>
+          <Menu.Item
+            leftSection={
+              <IconHeart
+                style={{ width: rem(16), height: rem(16) }}
+                color={"red"}
+                stroke={1.5}
+              />
+            }
+          >
+            Liked posts
+          </Menu.Item>
+        </Menu.Dropdown>
+      </Menu>
+    );
+  };
+
   return (
     <Box>
-      <Box component="header" h={56} px={"md"}>
+      <Box component="header" h={64} px={"md"}>
         <Group justify="space-between" h="100%">
           <Image src={"/meta-48.svg"} alt="Meta logo" height={48} width={48} />
 
@@ -32,12 +79,23 @@ const Header = () => {
             <Link href={"/todo"} className={classes.link}>
               Todo
             </Link>
+            <Link href={"/about"} className={classes.link}>
+              About
+            </Link>
           </Group>
 
-          <Group visibleFrom="sm">
-            <Button variant="default">Log in</Button>
-            <Button>Sign up</Button>
-          </Group>
+          {session?.user ? (
+            menuUser()
+          ) : (
+            <Group visibleFrom="sm">
+              <Button variant="default" component={Link} href={"/login"}>
+                Log in
+              </Button>
+              <Button component={Link} href={"/register"}>
+                Sign up
+              </Button>
+            </Group>
+          )}
 
           <Burger
             opened={drawerOpened}
@@ -65,13 +123,19 @@ const Header = () => {
           <Link href={"/todo"} className={classes.link}>
             Todo
           </Link>
+          <Link href={"/about"} className={classes.link}>
+            About
+          </Link>
 
           <Divider my="sm" />
-
-          <Group justify="center" grow pb="xl" px="md">
-            <Button variant="default">Log in</Button>
-            <Button>Sign up</Button>
-          </Group>
+          {session?.user ? null : (
+            <Group justify="center" grow pb="xl" px="md">
+              <Button variant="default">Log in</Button>
+              <Button component={Link} href={"/register"}>
+                Sign up
+              </Button>
+            </Group>
+          )}
         </ScrollArea>
       </Drawer>
     </Box>

@@ -19,4 +19,26 @@ model Todo {
   isCompleted Boolean   @default(false)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime? @updatedAt
+  //relationship
+  userId      String?   @db.ObjectId
+  user        User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  name      String?
+  username  String    @unique
+  password  String?
+  image     String?
+  role      UserRole  @default(USER)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+  //relationship
+  todos     Todo[]
+}
+
+enum UserRole {
+  ADMIN
+  MANAGER
+  USER
 }

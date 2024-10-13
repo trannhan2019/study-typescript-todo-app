@@ -1,5 +1,5 @@
-import { todoAddSchema } from "@/validation/todo";
-import prisma from "@/prisma/prismadb";
+import { todoAddSchema } from "@/schema/todo";
+import prisma from "@/libs/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
 // const prisma = new PrismaClient();

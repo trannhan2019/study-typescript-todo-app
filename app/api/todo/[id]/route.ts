@@ -1,5 +1,5 @@
-import prisma from "@/prisma/prismadb";
-import { todoEditSchema } from "@/validation/todo";
+import prisma from "@/libs/prisma";
+import { todoEditSchema } from "@/schema/todo";
 import { NextRequest, NextResponse } from "next/server";
 
 interface Props {

@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
 
 interface Props {
-  total: string | undefined;
+  total: number | undefined;
 }
 
 const TodoPagination = ({ total }: Props) => {
@@ -32,7 +32,7 @@ const TodoPagination = ({ total }: Props) => {
   return (
     <Group mt={20} justify="end">
       <Pagination
-        total={parseInt(total as string)}
+        total={total || 0}
         withEdges
         value={Number(params?.page || 1)}
         onChange={onChange}

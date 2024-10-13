@@ -9,11 +9,12 @@ import {
   UnstyledButton,
 } from "@mantine/core";
 import { IconCancel, IconEdit } from "@tabler/icons-react";
-import TodoEditModal from "../TodoEditModal/TodoEditModal";
+import TodoEditModal from "../todo-edit-modal/todo-edit-modal";
 import { useDisclosure } from "@mantine/hooks";
 import { useRouter } from "next-nprogress-bar";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
+import { deleteTodo } from "@/actions/todo";
 
 interface TodoProps {
   todo: TodoType;
@@ -37,23 +38,23 @@ const Todo = ({ todo }: TodoProps) => {
       confirmProps: { color: "red" },
       // onCancel: () => console.log("Cancel"),
       onConfirm: async () => {
-        try {
-          await fetch(`/api/todo/${todo.id}`, {
-            method: "DELETE",
-          });
-          router.refresh();
-          notifications.show({
-            title: "Success",
-            message: "Todo deleted successfully",
-            color: "green",
-          });
-        } catch (error) {
-          notifications.show({
-            title: "Error",
-            message: "Error while deleting todo",
-            color: "red",
-          });
-        }
+        deleteTodo(todo.id).then((res) => {
+          if (res?.error) {
+            notifications.show({
+              title: "Error",
+              message: res.error,
+              color: "red",
+            });
+          }
+          if (res?.success) {
+            router.refresh();
+            notifications.show({
+              title: "Success",
+              message: res.success,
+              color: "green",
+            });
+          }
+        });
       },
     });
 

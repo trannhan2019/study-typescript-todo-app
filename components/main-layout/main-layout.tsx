@@ -1,7 +1,7 @@
 "use client";
 
 import { AppShell } from "@mantine/core";
-import Header from "../header/Header";
+import Header from "./header/header";
 
 export default function MainLayout({
   children,

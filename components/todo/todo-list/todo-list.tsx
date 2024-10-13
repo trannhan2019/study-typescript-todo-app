@@ -1,9 +1,9 @@
 "use client";
 
 import { TodoResponse, TodoType } from "@/types/todo.type";
-import Todo from "../Todo/Todo";
+import Todo from "../todo-item/todo-item";
 import { Paper, Stack } from "@mantine/core";
-import TodoPagination from "../TodoPagination/TodoPagination";
+import TodoPagination from "../todo-pagination/todo-pagination";
 
 interface Props {
   todoData: TodoResponse;

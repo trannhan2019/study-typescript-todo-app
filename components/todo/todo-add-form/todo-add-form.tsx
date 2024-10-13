@@ -4,16 +4,17 @@ import { useForm } from "@mantine/form";
 import { z } from "zod";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { Box, Button, FocusTrap, Group, TextInput } from "@mantine/core";
-import { todoAddSchema } from "@/validation/todo";
+import { todoAddSchema } from "@/schema/todo";
 import { useRouter } from "next-nprogress-bar";
-import { useState } from "react";
 import { notifications } from "@mantine/notifications";
+import { useTransition } from "react";
+import { addTodo } from "@/actions/todo";
 
 export type FormValues = z.infer<typeof todoAddSchema>;
 
 const TodoAddForm = () => {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   const form = useForm<FormValues>({
     mode: "uncontrolled",
@@ -23,40 +24,27 @@ const TodoAddForm = () => {
     validate: zodResolver(todoAddSchema),
   });
 
-  const onSubmit = async (values: FormValues): Promise<void> => {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/todo", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
+  const onSubmit = async (values: FormValues) => {
+    startTransition(() => {
+      addTodo(values).then((res) => {
+        if (res?.error) {
+          notifications.show({
+            title: "Error",
+            message: res.error,
+            color: "red",
+          });
+        }
+        if (res?.success) {
+          form.reset();
+          router.refresh();
+          notifications.show({
+            title: "Success",
+            message: res.success,
+            color: "green",
+          });
+        }
       });
-
-      if (!res.ok) {
-        throw new Error("Something went wrong");
-      }
-
-      form.reset();
-      router.refresh();
-      notifications.show({
-        title: "Success",
-        message: "Todo added successfully",
-        color: "green",
-      });
-
-      setLoading(false);
-    } catch (error) {
-      console.log("Error while Registeing", error);
-      notifications.show({
-        title: "Error",
-        message: "Error while Registeing",
-        color: "red",
-      });
-
-      setLoading(false);
-    }
+    });
   };
 
   return (
@@ -70,7 +58,7 @@ const TodoAddForm = () => {
               {...form.getInputProps("title")}
             />
           </FocusTrap>
-          <Button size="sm" loading={loading} type="submit">
+          <Button size="sm" loading={isPending} type="submit">
             Add Todo
           </Button>
         </Group>

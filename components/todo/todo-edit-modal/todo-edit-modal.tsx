@@ -1,15 +1,16 @@
 "use client";
 
 import { TodoType } from "@/types/todo.type";
-import { todoEditSchema } from "@/validation/todo";
+import { todoEditSchema } from "@/schema/todo";
 import { Button, Card, Group, Modal, Switch, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 
 import { notifications } from "@mantine/notifications";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useTransition } from "react";
 import { z } from "zod";
+import { editTodo } from "@/actions/todo";
 
 interface TodoEditModalProps {
   opened: boolean;
@@ -22,7 +23,7 @@ interface FormValues extends z.infer<typeof todoEditSchema> {
 }
 const TodoEditModal = ({ opened, close, todo }: TodoEditModalProps & {}) => {
   // console.log("todo tai modal edit", todo);
-  const [loading, setLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   const router = useRouter();
 
@@ -45,39 +46,27 @@ const TodoEditModal = ({ opened, close, todo }: TodoEditModalProps & {}) => {
   // console.log(form.values);
 
   const onSubmit = async (values: typeof form.values) => {
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/todo/${todo?.id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
+    startTransition(() => {
+      editTodo(todo?.id, values).then((res) => {
+        if (res?.error) {
+          notifications.show({
+            title: "Error",
+            message: res.error,
+            color: "red",
+          });
+        }
+        if (res?.success) {
+          close();
+          form.reset();
+          router.refresh();
+          notifications.show({
+            title: "Success",
+            message: res.success,
+            color: "green",
+          });
+        }
       });
-
-      if (res.ok) {
-        close();
-        form.reset();
-        setLoading(false);
-        notifications.show({
-          title: "Success",
-          message: "Todo added successfully",
-          color: "green",
-        });
-        router.refresh();
-      } else {
-        console.log("Error while Registeing", res);
-        setLoading(false);
-        notifications.show({
-          title: "Error",
-          message: "Error while Registeing",
-          color: "red",
-        });
-      }
-    } catch (error) {
-      console.log(error);
-      setLoading(false);
-    }
+    });
   };
 
   return (
@@ -118,7 +107,7 @@ const TodoEditModal = ({ opened, close, todo }: TodoEditModalProps & {}) => {
               <Button variant="outline" onClick={close}>
                 Cancel
               </Button>
-              <Button type="submit" loading={loading} variant="gradient">
+              <Button type="submit" loading={isPending} variant="gradient">
                 Save
               </Button>
             </Group>

@@ -9,8 +9,8 @@ export type TodoType = {
 export type TodoResponse =
   | {
       todos: TodoType[];
-      page: string;
-      totalPages: string;
+      page: number;
+      totalPages: number;
     }
   | undefined;
 

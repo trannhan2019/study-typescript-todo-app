@@ -88,6 +88,9 @@ const Header = () => {
             <Link href={"/"} className={classes.link}>
               Home
             </Link>
+            <Link href={"/book"} className={classes.link}>
+              Book
+            </Link>
             <Link href={"/todo"} className={classes.link}>
               Todo
             </Link>

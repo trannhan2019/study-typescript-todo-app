@@ -1,81 +1,79 @@
 "use server";
 
-import { authLoginSchema, authRegisterSchema } from "@/schema/auth";
+import { authRegisterSchema } from "@/schema/auth";
 import { z } from "zod";
 import prisma from "@/libs/prisma";
-import { compare, hash } from "bcryptjs";
-import { signIn } from "next-auth/react";
+import { hash } from "bcryptjs";
+// import { signIn } from "next-auth/react"; // use client
 
-// export const register = async (values: z.infer<typeof authRegisterSchema>) => {
-//   const validated = authRegisterSchema.safeParse(values);
-//   if (!validated.success) {
-//     return { error: "Invalid values" };
-//   }
-
-//   const { name, username, password } = validated.data;
-//   const checkUser = await prisma.user.findUnique({
-//     where: {
-//       username,
-//     },
-//   });
-
-//   if (checkUser) {
-//     return { error: "User already exists" };
-//   }
-
-//   const hashedPassword = await hash(password, 10);
-
-//   const res = await prisma.user.create({
-//     data: {
-//       name,
-//       username,
-//       password: hashedPassword,
-//     },
-//   });
-
-//   if (!res) {
-//     return { error: "Something went wrong" };
-//   }
-
-//   return { success: "User created successfully" };
-// };
-
-export const login = async (values: z.infer<typeof authLoginSchema>) => {
-  const validated = authLoginSchema.safeParse(values);
+export const register = async (values: z.infer<typeof authRegisterSchema>) => {
+  const validated = authRegisterSchema.safeParse(values);
   if (!validated.success) {
     return { error: "Invalid values" };
   }
 
-  const { username, password } = validated.data;
-  const user = await prisma.user.findUnique({
+  const { name, username, password } = validated.data;
+  const checkUser = await prisma.user.findUnique({
     where: {
       username,
     },
   });
 
-  if (!user || !user.password) {
-    return { error: "User not found" };
+  if (checkUser) {
+    return { error: "User already exists" };
   }
 
-  const passwordsMatch = await compare(password, user.password);
+  const hashedPassword = await hash(password, 10);
 
-  if (!passwordsMatch) {
-    return { error: "Invalid password" };
-  }
-
-  try {
-    await signIn("credentials", {
-      redirect: false,
+  const res = await prisma.user.create({
+    data: {
+      name,
       username,
-      password,
-    });
-    return { success: "User logged in successfully" };
-  } catch (error) {
-    console.log(error);
+      password: hashedPassword,
+    },
+  });
 
-    throw error;
+  if (!res) {
+    return { error: "Something went wrong" };
   }
+
+  return { success: "User created successfully" };
 };
+
+// export const login = async (values: z.infer<typeof authLoginSchema>) => {
+//   const validated = authLoginSchema.safeParse(values);
+//   if (!validated.success) {
+//     return { error: "Invalid values" };
+//   }
+
+//   const { username, password } = validated.data;
+//   const user = await prisma.user.findUnique({
+//     where: {
+//       username,
+//     },
+//   });
+
+//   if (!user || !user.password) {
+//     return { error: "User not found" };
+//   }
+
+//   const passwordsMatch = await compare(password, user.password);
+
+//   if (!passwordsMatch) {
+//     return { error: "Invalid password" };
+//   }
+
+//   try {
+//     await signIn("credentials", {
+//       username,
+//       password,
+//       redirect: false,
+//     });
+//     return { success: "User logged in successfully" };
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
 
 // export const logout = async () => {
 //   await signOut({

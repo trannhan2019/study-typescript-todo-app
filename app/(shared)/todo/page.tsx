@@ -1,9 +1,11 @@
 import { Anchor, Container, Group, Paper, Title } from "@mantine/core";
 import Link from "next/link";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/libs/auth";
+import { redirect } from "next/navigation";
 
 import { TodoResponse, TodoSearchParams } from "@/types/todo.type";
 import TodoList from "@/components/todo/todo-list/todo-list";
-import prisma from "@/libs/prisma";
 import TodoAddForm from "@/components/todo/todo-add-form/todo-add-form";
 import TodoSearch from "@/components/todo/todo-search/todo-search";
 import { getTodos } from "@/actions/todo";
@@ -13,6 +15,12 @@ interface PageProps {
 }
 
 const TodoPage = async ({ searchParams }: PageProps) => {
+  const session = await getServerSession(authOptions);
+  console.log("session at todo page", session);
+
+  if (!session) {
+    redirect("/login");
+  }
   const data = await getTodos(searchParams);
 
   return (

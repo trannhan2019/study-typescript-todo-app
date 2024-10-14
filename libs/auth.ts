@@ -2,32 +2,34 @@ import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import prisma from "./prisma";
 import { compare } from "bcryptjs";
-import { User, UserRole } from "@prisma/client";
+import { authLoginSchema } from "@/schema/auth";
 
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
-      name: "Credentials",
+      name: "credentials",
       credentials: {
         username: { label: "Username", type: "text" },
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.username || !credentials.password) {
-          return null;
+        const validated = authLoginSchema.safeParse(credentials);
+
+        if (!validated.success) {
+          throw new Error("Invalid credentials");
         }
-        const { username, password } = credentials;
+        const { username, password } = validated.data;
         const user = await prisma.user.findUnique({
           where: {
             username,
           },
         });
         if (!user || !user.password) {
-          return null;
+          throw new Error("User not found");
         }
         const passwordsMatch = await compare(password, user.password);
         if (!passwordsMatch) {
-          return null;
+          throw new Error("Invalid credentials");
         }
         return user;
       },

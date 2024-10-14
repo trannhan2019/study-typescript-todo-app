@@ -9,19 +9,18 @@ import {
   TextInput,
 } from "@mantine/core";
 import Link from "next/link";
-import { signIn } from "@/auth";
-import { useSearchParams } from "next/navigation";
+// import { useSearchParams } from "next/navigation";
 import { useForm, zodResolver } from "@mantine/form";
 import { authLoginSchema } from "@/schema/auth";
 import { notifications } from "@mantine/notifications";
 import { useTransition } from "react";
 import { useRouter } from "next-nprogress-bar";
-import { login } from "@/actions/auth";
+import { signIn } from "next-auth/react";
 
 export default function LoginForm() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl");
+  // const searchParams = useSearchParams();
+  // const callbackUrl = searchParams.get("callbackUrl");
   const [isPending, startTransition] = useTransition();
 
   const form = useForm({
@@ -33,9 +32,13 @@ export default function LoginForm() {
     validate: zodResolver(authLoginSchema),
   });
 
-  const onSubmit = async (values: typeof form.values) => {
-    startTransition(() => {
-      login(values)
+  const onSubmit = (values: typeof form.values) => {
+    startTransition(async () => {
+      await signIn("credentials", {
+        username: values.username,
+        password: values.password,
+        redirect: false,
+      })
         .then((res) => {
           if (res?.error) {
             notifications.show({
@@ -45,19 +48,18 @@ export default function LoginForm() {
               position: "top-right",
             });
           }
-          if (res?.success) {
-            notifications.show({
-              color: "green",
-              title: "Success",
-              message: res.success,
-              position: "top-right",
-            });
+          if (res?.ok) {
             router.push("/");
             form.reset();
           }
         })
         .catch((err) => {
-          console.log(err);
+          notifications.show({
+            color: "red",
+            title: "Error",
+            message: err.message,
+            position: "top-right",
+          });
         });
     });
   };

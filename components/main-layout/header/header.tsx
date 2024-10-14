@@ -18,15 +18,22 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import classes from "./header.module.css";
 import Image from "next/image";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { IconChevronDown, IconHeart, IconPower } from "@tabler/icons-react";
+import { useRouter } from "next-nprogress-bar";
 
 const Header = () => {
   const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] =
     useDisclosure(false);
 
+  const router = useRouter();
+
   const { data: session } = useSession();
-  console.log(session);
+  // console.log(session);
+  const handleLogout = async () => {
+    await signOut({ redirect: false });
+    router.push("/login");
+  };
 
   const menuUser = () => {
     return (
@@ -47,10 +54,15 @@ const Header = () => {
           </UnstyledButton>
         </Menu.Target>
         <Menu.Dropdown>
-          <Menu.Item leftSection={<IconPower style={{ width: rem(16) }} />}>
+          <Menu.Item
+            leftSection={<IconPower style={{ width: rem(16) }} />}
+            onClick={handleLogout}
+          >
             Log out
           </Menu.Item>
           <Menu.Item
+            component={Link}
+            href={"/dashboard"}
             leftSection={
               <IconHeart
                 style={{ width: rem(16), height: rem(16) }}
@@ -59,7 +71,7 @@ const Header = () => {
               />
             }
           >
-            Liked posts
+            Dashboard
           </Menu.Item>
         </Menu.Dropdown>
       </Menu>

@@ -1,8 +1,15 @@
 import { Center, Paper, Title } from "@mantine/core";
 import classes from "./style.module.css";
 import LoginForm from "@/components/auth/login-form/login-form";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/libs/auth";
+import { redirect } from "next/navigation";
 
 export default async function LoginPage() {
+  const session = await getServerSession(authOptions);
+  if (session) {
+    redirect("/");
+  }
   return (
     <div className={classes.wrapper}>
       <div className={classes.bgImage}></div>

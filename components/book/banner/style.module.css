@@ -2,10 +2,10 @@
   /* background-color: #11284b; */
   background-size: cover;
   background-position: center;
+  background-repeat: no-repeat;
   background-image: url("/slider-bg-2.jpg");
-  /* padding-top: calc(var(--mantine-spacing-xl) * 3); */
-  /* padding-bottom: calc(var(--mantine-spacing-xl) * 3); */
-  height: 500px;
+
+  min-height: 500px;
 }
 
 .inner {

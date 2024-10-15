@@ -1,5 +1,4 @@
-import "@mantine/core/styles.css";
-import "@mantine/notifications/styles.css";
+import "./globals.css";
 
 import { theme } from "@/libs/theme";
 import { MantineProvider } from "@mantine/core";
@@ -8,7 +7,6 @@ import { ModalsProvider } from "@mantine/modals";
 import type { Metadata } from "next";
 
 import ProgressBarProvider from "@/providers/ProgressBarProvider";
-import { auth } from "@/auth";
 import { NextAuthProvider } from "@/providers/auth-provider";
 
 export const metadata: Metadata = {

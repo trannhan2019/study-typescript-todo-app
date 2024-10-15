@@ -13,9 +13,10 @@
   padding-left: var(--mantine-spacing-md);
   padding-right: var(--mantine-spacing-md);
   text-decoration: none;
-  color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
-  font-weight: 500;
+  color: light-dark(var(--mantine-color-gray-7), var(--mantine-color-white));
+  font-weight: 700;
   font-size: var(--mantine-font-size-sm);
+  text-transform: uppercase;
 
   @media (max-width: $mantine-breakpoint-sm) {
     height: rem(42px);
@@ -27,6 +28,7 @@
       var(--mantine-color-gray-0),
       var(--mantine-color-dark-6)
     );
+    color: var(--mantine-color-orange-5);
   }
 }
 

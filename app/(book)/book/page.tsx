@@ -5,8 +5,8 @@ import { Stack } from "@mantine/core";
 export default function BookPage() {
   return (
     <Stack>
-      <BookBanner />
-      <BookServices />
+      {/* <BookBanner />
+      <BookServices /> */}
     </Stack>
   );
 }
